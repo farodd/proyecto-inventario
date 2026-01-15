@@ -1,0 +1,209 @@
+{
+  "version": "1.0",
+  "ultima_actualizacion": "2026-01-14",
+  "categorias": {
+    "IMPERMEABILIZACION": {
+      "variaciones": [
+        "IMPERMEABILIAZACIÓN",
+        "IMPERMEABILIZACIÓN",
+        "Impermeabilizacion",
+        "impermeabilizacion"
+      ],
+      "estandar": "IMPERMEABILIZACION",
+      "descripcion": "Materiales para impermeabilización"
+    },
+    "HUMECTACION": {
+      "variaciones": [
+        "HUMECTACIÓN",
+        "Humectacion",
+        "humectacion"
+      ],
+      "estandar": "HUMECTACION",
+      "descripcion": "Materiales para humectación"
+    },
+    "INSTRUMENTACION GEOTECNICA": {
+      "variaciones": [
+        "INSTRUMENTACIÓN GEOTECNICA",
+        "Instrumentacion Geotecnica",
+        "instrumentacion geotecnica"
+      ],
+      "estandar": "INSTRUMENTACION GEOTECNICA",
+      "descripcion": "Instrumentación geotécnica"
+    },
+    "PIEZAS ESPECIALES": {
+      "variaciones": [
+        "PIEZAS ESPECIALIES",
+        "Piezas Especiales",
+        "piezas especiales"
+      ],
+      "estandar": "PIEZAS ESPECIALES",
+      "descripcion": "Piezas especiales y diversos"
+    },
+    "RIEGO MURO TRANQUE": {
+      "variaciones": [
+        "RIEGO MURO TRANQUE",
+        "Riego Muro Tranque",
+        "riego muro tranque"
+      ],
+      "estandar": "RIEGO MURO TRANQUE",
+      "descripcion": "Materiales para riego de muro tranque"
+    },
+    "PIPING": {
+      "variaciones": [
+        "PIPING",
+        "Piping"
+      ],
+      "estandar": "PIPING",
+      "descripcion": "Materiales para piping"
+    },
+    "VALVULAS": {
+      "variaciones": [
+        "VALVULAS",
+        "Valvulas",
+        "valvulas"
+      ],
+      "estandar": "VALVULAS",
+      "descripcion": "Válvulas de diversos tipos"
+    },
+    "PIEZOMETROS": {
+      "variaciones": [
+        "PIEZOMETROS",
+        "Piezometros",
+        "piezometros"
+      ],
+      "estandar": "PIEZOMETROS",
+      "descripcion": "Piezómetros de diversos tipos"
+    },
+    "OBRAS CIVILES":{
+      "variaciones": [
+        "OBRAS CIVILES",
+        "Obras civiles"
+      ],
+      "estandar": "OBRAS CIVILES",
+      "descripcion": "Obras civiles de diversos tipos"
+    },
+    "SERVICIOS GENERALES": {
+      "variaciones": [
+        "SERVICIOS GENERALES",
+        "Servicios generales"
+      ],
+      "estandar": "SERVICIOS GENERALES",
+      "descripcion": "Servicios generales"
+    },
+    "ILUMINACION EMPALIZADA": {
+      "variaciones": [
+        "ILUMINACION EMPALIZADA",
+        "Iluminacion empalizada"
+      ],
+      "estandar": "ILUMINACION EMPALIZADA",
+      "descripcion": "Materiales para iluminación de empalizada"
+    },
+    "TALLER BERLIAM": {
+      "variaciones": [
+        "TALLER BERLIAM",
+        "Taller berliam"
+      ],
+      "estandar": "TALLER BERLIAM",
+      "descripcion": "Materiales para taller berliam"
+    }
+  },
+  "unidades_medida": {
+    "UNIDAD": {
+      "variaciones": [
+        "UN",
+        "Unidad",
+        "unidad",
+        "und",
+        "UND"
+      ],
+      "estandar": "UNIDAD",
+      "simbolo": "UN"
+    },
+    "KIT": {
+      "variaciones": [
+        "kit",
+        "Kit"
+      ],
+      "estandar": "KIT",
+      "simbolo": "KIT"
+    },
+    "BIN": {
+      "variaciones": [
+        "Bins",
+        "Bin",
+        "bin"
+      ],
+      "estandar": "BIN",
+      "simbolo": "BIN"
+    },
+    "M": {
+      "variaciones": [
+        "Mt",
+        "Metros",
+        "mt",
+        "metros",
+        "metro",
+        "METROS"
+      ],
+      "estandar": "M",
+      "simbolo": "M"
+    },
+    "M2": {
+      "variaciones": [
+        "m2",
+        "M2",
+        "mts2",
+        "MTS2",
+        "metros2",
+        "Metro2",
+        "metro2"
+      ],
+      "estandar": "M2",
+      "simbolo": "M2"
+    },
+    "M3": {
+      "variaciones": [
+        "m3",
+        "M3",
+        "mts3",
+        "MTS3",
+        "metros3",
+        "Metro3",
+        "metro3"
+      ],
+      "estandar": "M3",
+      "simbolo": "M3"
+    },
+    "KG": {
+      "variaciones": [
+        "kg",
+        "Kg",
+        "kilos",
+        "kilogramo"
+      ],
+      "estandar": "KG",
+      "simbolo": "KG"
+    },
+    "LT": {
+      "variaciones": [
+        "lts",
+        "Lt",
+        "litro",
+        "litros",
+        "LITROS"
+      ],
+      "estandar": "LT",
+      "simbolo": "LT"
+    },
+    "ROLLO": {
+      "variaciones": [
+        "Rollo",
+        "ROLLOS",
+        "rollo",
+        "Rll"
+      ],
+      "estandar": "ROLLO",
+      "simbolo": "ROLLO"
+    }
+  }
+}

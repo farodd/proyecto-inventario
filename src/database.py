@@ -9,20 +9,6 @@ class InventarioDatabase:
         self.db_path = db_path
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
-        self.create_table()
-
-    def create_table(self):
-        """ Crear tabla insumos_operacionales"""
-        self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS insumos (
-                "CODIGO SAP" TEXT PRIMARY KEY,
-                "DESCRIPCION DEL MATERIAL" TEXT,
-                "CLASIFICACION" TEXT,
-                "UM" TEXT,
-                "OBSERVACIONES" TEXT
-            )
-        ''')
-        self.connection.commit()
 
     def insert_insumo(self, codigo_sap, descripcion, clasificacion, um, observaciones):
         """ Insertar o actualizar un insumo en la tabla """
