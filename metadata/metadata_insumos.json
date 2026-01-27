@@ -34,7 +34,8 @@
       "variaciones": [
         "PIEZAS ESPECIALIES",
         "Piezas Especiales",
-        "piezas especiales"
+        "piezas especiales",
+        "PIEZA ESPECIAL"
       ],
       "estandar": "PIEZAS ESPECIALES",
       "descripcion": "Piezas especiales y diversos"
@@ -69,7 +70,8 @@
       "variaciones": [
         "PIEZOMETROS",
         "Piezometros",
-        "piezometros"
+        "piezometros",
+        "PIEZÓMETROS"
       ],
       "estandar": "PIEZOMETROS",
       "descripcion": "Piezómetros de diversos tipos"
