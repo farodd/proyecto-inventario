@@ -139,3 +139,7 @@ class InventarioDatabase:
             
     def close(self):
         self.connection.close()
+
+class InventoryValidator:
+    """ Clase para validar datos de inventario """
+
