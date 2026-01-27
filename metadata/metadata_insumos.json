@@ -7,7 +7,8 @@
         "IMPERMEABILIAZACIÓN",
         "IMPERMEABILIZACIÓN",
         "Impermeabilizacion",
-        "impermeabilizacion"
+        "impermeabilizacion",
+        "IMPERMEABILIZACIÓN LLAU-LLAU"
       ],
       "estandar": "IMPERMEABILIZACION",
       "descripcion": "Materiales para impermeabilización"
@@ -117,7 +118,9 @@
         "unidad",
         "und",
         "UND",
-        "saco 25 kg"
+        "saco 25 kg",
+        "Unidades",
+        "unidades"
       ],
       "estandar": "UNIDAD",
       "simbolo": "UN"
@@ -203,7 +206,8 @@
         "Rollo",
         "ROLLOS",
         "rollo",
-        "Rll"
+        "Rll",
+        "Rollos"
       ],
       "estandar": "ROLLO",
       "simbolo": "ROLLO"
