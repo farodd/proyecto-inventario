@@ -140,6 +140,203 @@ class InventarioDatabase:
     def close(self):
         self.connection.close()
 
-class InventoryValidator:
-    """ Clase para validar datos de inventario """
+# --- METODOS DE CONSULTA STOCK ---
 
+    def get_all_stock(self):
+        """ Obtener todos los registros de stock """
+        try:
+            self.cursor.execute("SELECT * FROM stock")
+            columnas = [description[0] for description in self.cursor.description]
+            datos = self.cursor.fetchall()
+            return columnas, datos
+        except Exception as e:
+            print(f"❌ Error al obtener stock: {e}")
+            return [], []
+        
+    def delete_stock(self,codigo_sap):
+        """ Eliminar un registro de stock por código SAP """
+        try:
+            self.cursor.execute("DELETE FROM stock WHERE CODIGO_SAP = ?", (codigo_sap,))
+            if self.cursor.rowcount > 0:
+                self.connection.commit()
+                print(f"✓ Stock con código SAP {codigo_sap} eliminado correctamente.")
+                return True
+            else:
+                print(f"❌ No se encontró stock con código SAP {codigo_sap}.")
+                return False
+        except Exception as e:
+            print(f"❌ Error al eliminar stock: {e}")
+            return False
+        
+    def get_stock_alerts(self):
+        """Obtener alertas de stock clasificadas"""
+        try:
+            self.cursor.execute(''' SELECT "CODIGO SAP", 
+                                "CLASIFICACION", 
+                                "DESCRIPCION DEL MATERIAL", 
+                                "UM", 
+                                "STOCK ACTUAL", 
+                                "PUNTO DE REORDENAMIENTO",
+                                CASE 
+                                    WHEN "STOCK ACTUAL" = 0 THEN 'SIN STOCK'
+                                    WHEN "PUNTO REORDENAMIENTO" > 0
+                                        AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 0.5
+                                        THEN "STOCK CRITICO"
+                                    WHEN "PUNTO REORDENAMIENTO" > 0
+                                        AND ("STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 1.05 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 1.20)
+                                        THEN "PROXIMO A REORDENAR"
+                                    WHEN "PUNTO REORDENAMIENTO" > 0
+                                        AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 3
+                                        THEN "SOBRE STOCK"
+                                    ELSE 'NORMAL'
+                                END AS "ALERTA"
+                                FROM stock
+                                WHERE "STOCK ACTUAL " = 0
+                                OR ("PUNTO REORDENAMIENTO" > 0 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO")
+                                OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 1.05 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 1.20)
+                                OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 3)
+                                ORDER BY
+                                CASE 
+                                    WHEN "STOCK ACTUAL" = 0 THEN 1
+                                    WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 0.5 THEN 2
+                                    WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" THEN 3
+                                    ELSE 4
+                                END
+                                ''')
+            columnas = [description[0] for description in self.cursor.description]
+            datos = self.cursor.fetchall() 
+            return columnas, datos
+        except Exception as e:
+            print(f"❌ Error al obtener alertas de stock: {e}")
+            return [], []
+
+# --- METODO CONSULTAS DE INGRESOS ---
+
+    def get_all_ingresos(self):
+        """ Obtener todos los registros de ingresos """
+        try:
+            self.cursor.execute('SELECT * FROM ingresos ORDER BY "FECHA DE INGRESO" DESC')
+            columnas = [description[0] for description in self.cursor.description]
+            datos = self.cursor.fetchall()
+            return columnas, datos
+        except Exception as e:
+            print(f"❌ Error al obtener ingresos: {e}")
+            return [], []
+        
+    def delete_ingreso(self, id):
+        """ Eliminar un registro de ingreso por ID """
+        try:
+            self.cursor.execute('DELETE FROM ingresos WHERE "ID" = ?', (id,))
+            if self.cursor.rowcount > 0:
+                self.connection.commit()
+                print(f"✓ Ingreso con ID {id} eliminado correctamente.")
+                return True
+            else:
+                print(f"❌ No se encontró ingreso con ID {id}.")
+                return False
+        except Exception as e:
+            print(f"❌ Error al eliminar ingreso: {e}")
+            return False
+            
+# --- METODO CONSULTAS DE SALIDAS ---
+
+    def get_all_salidas(self):
+        """ Obtener todos los registros de salidas """
+        try:
+            self.cursor.execute('SELECT * FROM salidas ORDER BY "FECHA DE SALIDA" DESC')
+            columnas = [description[0] for description in self.cursor.description]
+            datos = self.cursor.fetchall()
+            return columnas, datos
+        except Exception as e:
+            print(f"❌ Error al obtener salidas: {e}")
+            return [], []
+        
+    def delete_salida(self, id):
+        """ Eliminar un registro de salida por ID """
+        try:
+            self.cursor.execute('DELETE FROM salidas WHERE "ID" = ?', (id,))
+            if self.cursor.rowcount > 0:
+                self.connection.commit()
+                print(f"✓ Salida con ID {id} eliminado correctamente.")
+                return True
+            else:
+                print(f"❌ No se encontró salida con ID {id}.")
+                return False
+        except Exception as e:
+            print(f"❌ Error al eliminar salida: {e}")
+            return False
+        
+# --- METODOS DE ACTUALIZACIÓN DE STOCK ---
+
+    def update_stock_on_ingreso(self, codigo_sap, cantidad):
+        """ Al registrar ingreso: sumar cantidad a STOCK ACTUAL"""
+        try:
+            self.cursor.execute('''
+                UPDATE stock
+                SET "STOCK ACTUAL" = "STOCK ACTUAL" + ?
+                WHERE "CODIGO SAP" = ?
+            ''', (cantidad, codigo_sap))
+            if self.cursor.rowcount > 0:
+                self.connection.commit()
+                print(f"Stock actualizado: {codigo_sap} incrementado en {cantidad}.")
+                return True
+            else:
+                print(f"Material {codigo_sap} no encontrado en stock.")
+                return False
+        except Exception as e:
+            print(f"❌ Error al actualizar stock: {e}")
+            return False
+        
+    def update_stock_on_salida(self, codigo_sap, cantidad):
+        """ Al registrar salida: restar cantidad a STOCK ACTUAL"""
+        try:
+            self.cursor.execute('''
+                SELECT "STOCK ACTUAL" FROM stock WHERE "CODIGO SAP" = ?''',
+                (codigo_sap,))
+            row = self.cursor.fetchone()
+            if not row:
+                print(f"Material {codigo_sap} no encontrado en stock.")
+                return False
+            if (row[0] or 0) < cantidad:
+                print(f"Stock insuficiente para {codigo_sap}. Stock actual: {row[0]}, cantidad solicitada: {cantidad}.")
+                return False
+            
+            self.cursor.execute('''
+                UPDATE stock
+                SET "STOCK ACTUAL" = "STOCK ACTUAL" - ?
+                WHERE "CODIGO SAP" = ?
+            ''', (cantidad, codigo_sap))
+            self.connection.commit()
+            print(f"Stock actualizado: {codigo_sap} decrementado en {cantidad}.")
+            return True
+        except Exception as e:
+            print(f"❌ Error al actualizar stock: {e}")
+            return False, str(e)
+        
+    def revert_stock_ingreso(self, codigo_sap, cantidad):
+        """ Al eliminar ingreso: restar cantidad a STOCK ACTUAL"""
+        try:
+            self.cursor.execute('''
+                UPDATE stock
+                SET "STOCK ACTUAL" = MAX(0, "STOCK ACTUAL" - ?)
+                WHERE "CODIGO SAP" = ?
+            ''', (cantidad, codigo_sap))
+            self.connection.commit()
+            return self.cursor.rowcount > 0
+        except Exception as e:
+            print(f"❌ Error al revertir stock por eliminación de ingreso: {e}")
+            return False
+        
+    def revert_stock_salida(self, codigo_sap, cantidad):
+        """ Al eliminar salida: sumar cantidad a STOCK ACTUAL"""
+        try:
+            self.cursor.execute('''
+                UPDATE stock
+                SET "STOCK ACTUAL" = "STOCK ACTUAL" + ?
+                WHERE "CODIGO SAP" = ?
+            ''', (cantidad, codigo_sap))
+            self.connection.commit()
+            return self.cursor.rowcount > 0
+        except Exception as e:
+            print(f"❌ Error al revertir stock por eliminación de salida: {e}")
+            return False

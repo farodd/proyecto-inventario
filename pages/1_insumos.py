@@ -202,102 +202,102 @@ with tab1:
     except Exception as e:
         st.error(f"❌ Error al consultar insumos: {e}")
 
-# CARRITO DE MATERIALES SELECCIONADOS
-if st.session_state.get('materiales_guardados', False):
+    # CARRITO DE MATERIALES SELECCIONADOS
+    if st.session_state.get('materiales_guardados', False):
 
-    # Header con información y botón de limpiar
-    col1, col2, = st.columns([0.7, 0.3])
+        # Header con información y botón de limpiar
+        col1, col2, = st.columns([0.7, 0.3])
 
-    with col1:
-        materiales = st.session_state.get('materiales_seleccionados', [])
-        st.markdown(f"### 📦 Materiales seleccionados para gestión ({len(materiales)})")
-        st.caption("Listos para usar en ingresos o salidas")
+        with col1:
+            materiales = st.session_state.get('materiales_seleccionados', [])
+            st.markdown(f"### 📦 Materiales seleccionados para gestión ({len(materiales)})")
+            st.caption("Listos para usar en ingresos o salidas")
 
-    with col2:
-        if st.button("🗑️ Limpiar selección", 
-                     type="secondary", 
-                     help="Borrar materiales guardados y volver a seleccionar"):
-            # Incrementar contador para resetear tabla
-            st.session_state['tabla_reset_counter'] = st.session_state.get('tabla_reset_counter', 0) + 1
-            # Limpiar todo
-            if 'materiales_seleccionados' in st.session_state:
-                del st.session_state['materiales_seleccionados']
-            st.session_state['materiales_guardados'] = False
-            st.toast("🗑️ Selección de materiales limpiada", icon="✅")
-            st.rerun()
+        with col2:
+            if st.button("🗑️ Limpiar selección", 
+                        type="secondary", 
+                        help="Borrar materiales guardados y volver a seleccionar"):
+                # Incrementar contador para resetear tabla
+                st.session_state['tabla_reset_counter'] = st.session_state.get('tabla_reset_counter', 0) + 1
+                # Limpiar todo
+                if 'materiales_seleccionados' in st.session_state:
+                    del st.session_state['materiales_seleccionados']
+                st.session_state['materiales_guardados'] = False
+                st.toast("🗑️ Selección de materiales limpiada", icon="✅")
+                st.rerun()
 
-    with st.container(border=True):
-        materiales = st.session_state.get('materiales_seleccionados', [])
-        
-        st.markdown("**Materiales seleccionados:**")
-
-        # ✅ Díalogo de confirmación para eliminar
-        @st.dialog(f"confirmar_eliminar")
-        def confirmar_eliminacion(material,indice):
-            st.write(f"¿Eliminar **{material['codigo_sap']}**?")
-            st.write(f"**Descripción:** {material['descripcion']}")
-            st.info("**Nota:** Al eliminar este material hara qué se deseleccionen todos los materiales de la tabla principal" \
-            " Pero, los materiales restantes siguen en el carrito.")
+        with st.container(border=True):
+            materiales = st.session_state.get('materiales_seleccionados', [])
             
-            col_si, col_no = st.columns(2)
-            with col_si:
-                if st.button("✅ Sí", type="primary"):
-                    # Eliminar este material
+            st.markdown("**Materiales seleccionados:**")
 
-                    materiales = st.session_state.get('materiales_seleccionados', [])
-                    materiales_filtrados = [m for j, m in enumerate(materiales) if j != indice]
-                    print(f"-------------------- MATERIALES FILTRADOS {materiales_filtrados}--------------------")
-                    
-                    st.session_state['materiales_seleccionados'] = materiales_filtrados
+            # ✅ Díalogo de confirmación para eliminar
+            @st.dialog(f"confirmar_eliminar")
+            def confirmar_eliminacion(material,indice):
+                st.write(f"¿Eliminar **{material['codigo_sap']}**?")
+                st.write(f"**Descripción:** {material['descripcion']}")
+                st.info("**Nota:** Al eliminar este material hara qué se deseleccionen todos los materiales de la tabla principal" \
+                " Pero, los materiales restantes siguen en el carrito.")
+                
+                col_si, col_no = st.columns(2)
+                with col_si:
+                    if st.button("✅ Sí", type="primary"):
+                        # Eliminar este material
 
-                    st.session_state['tabla_reset_counter'] = st.session_state.get('tabla_reset_counter', 0) + 1
-                    
-                    if len(materiales_filtrados) == 0:
+                        materiales = st.session_state.get('materiales_seleccionados', [])
+                        materiales_filtrados = [m for j, m in enumerate(materiales) if j != indice]
+                        print(f"-------------------- MATERIALES FILTRADOS {materiales_filtrados}--------------------")
+                        
+                        st.session_state['materiales_seleccionados'] = materiales_filtrados
+
                         st.session_state['tabla_reset_counter'] = st.session_state.get('tabla_reset_counter', 0) + 1
-                        st.session_state['materiales_guardados'] = False
-                        # Solo resetear tablla si ya no quedan materiales
-                        st.toast(f"🗑️ {material['codigo_sap']} eliminado. Lista quedó vacía", icon="✅")
-                    else:
-                        st.toast(f"🗑️ {material['codigo_sap']} eliminado. Quedan {len(materiales_filtrados)} materiales", icon="✅")
-                    time.sleep(2)
-                    st.rerun()
+                        
+                        if len(materiales_filtrados) == 0:
+                            st.session_state['tabla_reset_counter'] = st.session_state.get('tabla_reset_counter', 0) + 1
+                            st.session_state['materiales_guardados'] = False
+                            # Solo resetear tablla si ya no quedan materiales
+                            st.toast(f"🗑️ {material['codigo_sap']} eliminado. Lista quedó vacía", icon="✅")
+                        else:
+                            st.toast(f"🗑️ {material['codigo_sap']} eliminado. Quedan {len(materiales_filtrados)} materiales", icon="✅")
+                        time.sleep(2)
+                        st.rerun()
+                
+                with col_no:
+                    if st.button("❌ No", key=f"no_{i}", type = "secondary"):
+                        st.rerun()
             
-            with col_no:
-                if st.button("❌ No", key=f"no_{i}", type = "secondary"):
-                    st.rerun()
-        
-        for i, material in enumerate(materiales):
-            col1, col2 = st.columns([0.85, 0.15])
-            
-            with col1:
-                st.write(f"**{i+1}. {material['codigo_sap']} - {material['descripcion']}**")
-                st.caption(f"📂 {material['clasificacion']} | 📏 {material['um']}")
-            
-            with col2:
-                # Botón que activa diálogo
-                if st.button("🗑️", type="secondary", help="Eliminar material", key=f"eliminar_{i}"):
-                    confirmar_eliminacion(material, i)
+            for i, material in enumerate(materiales):
+                col1, col2 = st.columns([0.85, 0.15])
+                
+                with col1:
+                    st.write(f"**{i+1}. {material['codigo_sap']} - {material['descripcion']}**")
+                    st.caption(f"📂 {material['clasificacion']} | 📏 {material['um']}")
+                
+                with col2:
+                    # Botón que activa diálogo
+                    if st.button("🗑️", type="secondary", help="Eliminar material", key=f"eliminar_{i}"):
+                        confirmar_eliminacion(material, i)
 
-    # Botones de navegación
-    st.markdown ("### ¿Qué desea hacer con estos materiales?")
-    col1, col2, col3 = st.columns(3)
+        # Botones de navegación
+        st.markdown ("### ¿Qué desea hacer con estos materiales?")
+        col1, col2, col3 = st.columns(3)
 
-    with col1:
-        if st.button("📥 **Ir a Ingresos**", type="primary", use_container_width=True):
-            st.session_state['material_seleccionado'] = False
-            st.switch_page("pages/ingresos.py")
+        with col1:
+            if st.button("📥 **Ir a Ingresos**", type="primary", use_container_width=True):
+                st.session_state['material_seleccionado'] = False
+                st.switch_page("pages/ingresos.py")
 
-    with col2:
-        if st.button("📤 **Ir a Salidas**", type="primary", use_container_width=True):
-            st.session_state['material_seleccionado'] = False
-            st.switch_page("pages/salidas.py")
+        with col2:
+            if st.button("📤 **Ir a Salidas**", type="primary", use_container_width=True):
+                st.session_state['material_seleccionado'] = False
+                st.switch_page("pages/salidas.py")
 
-    with col3:
-        if st.button("➕ **Agregar Más**", type="secondary", use_container_width=True):
-            # Mantener los materiales pero permitir agregar más
-            st.session_state['materiales_guardados'] = False
-            st.info("💡 Puedes seleccionar materiales adicionales de la tabla")
-            st.rerun()
+        with col3:
+            if st.button("➕ **Agregar Más**", type="secondary", use_container_width=True):
+                # Mantener los materiales pero permitir agregar más
+                st.session_state['materiales_guardados'] = False
+                st.info("💡 Puedes seleccionar materiales adicionales de la tabla")
+                st.rerun()
 
 with tab2:
     st.subheader("➕ Agregar Nuevo Insumo")
@@ -449,9 +449,11 @@ with tab3:
             if event_editar.selection.rows:
                 fila_seleccionada = event_editar.selection.rows[0]
                 insumo = df_editar.iloc[fila_seleccionada]
+
+                codigo_key = insumo['Código SAP']
                 
                 st.markdown("---")
-                st.markdown(f"###  Editando: **{insumo['Código SAP']}**")
+                st.markdown(f"###  Editando: **{codigo_key}**")
                 
                 with st.container(border=True):
                     # Código SAP (solo lectura)
@@ -459,7 +461,7 @@ with tab3:
                         "Código SAP:",
                         value=insumo['Código SAP'],
                         disabled=True,
-                        key="edit_codigo_sap"
+                        key=f"edit_codigo_sap_{codigo_key}"
                     )
                     
                     # Descripción editable
@@ -467,7 +469,7 @@ with tab3:
                         "Descripción del Material: *",
                         value=insumo['Descripción'] if insumo['Descripción'] else "",
                         height=100,
-                        key="edit_descripcion"
+                        key=f"edit_descripcion_{codigo_key}"
                     )
                     
                     col1, col2 = st.columns(2)
