@@ -265,10 +265,13 @@ with tab_registrar:
             try:
                 db = InventarioDatabase(r'src\db\inventario_lp02.db')
 
-                stock_actualizado = db.update_stock_on_salida(material_actual['codigo_sap'], cantidad)
+                stock_actualizado, stock_actual = db.update_stock_on_salida(material_actual['codigo_sap'], cantidad)
 
                 if not stock_actualizado:
-                    st.error("No se pudo actualizar el stock. La salida no se registró.")
+                    if stock_actual is None:
+                        st.error(f"El material {material_actual['codigo_sap']} no se encuentra en stock. La salida no se registró.")
+                    else:
+                        st.error(f"Stock insuficiente. Stock actual: **{stock_actual}** - Cantidad solicitada: **{cantidad}**")
                     db.close()
                 
                 else:

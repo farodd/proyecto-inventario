@@ -84,7 +84,7 @@ else:
             st.info("No hay materiales sin stock.")
         else:
             st.error(f"**{n_sin_stock} materiales sin stock disponible.** Requieren reposición inmediata.")
-            st.dataframe(df_sin[cols_mostrar], use_container_width=True, hide_index=True)
+            st.dataframe(df_sin[cols_mostrar], width='stretch', hide_index=True)
 
     with tab_crit:
         df_crit = df_alertas[df_alertas["ALERTA"] == "STOCK CRITICO"]
@@ -92,7 +92,7 @@ else:
             st.info("No hay materiales en stock crítico.")
         else:
             st.warning(f"**{n_critico} materiales en nivel crítico** (por debajo del 50% del punto de reordenamiento).")
-            st.dataframe(df_crit[cols_mostrar], use_container_width=True, hide_index=True)
+            st.dataframe(df_crit[cols_mostrar], width='stretch', hide_index=True)
 
     with tab_reord:
         df_reord = df_alertas[df_alertas["ALERTA"] == "PROXIMO A REORDENAR"]
@@ -100,7 +100,7 @@ else:
             st.info("No hay materiales próximos a reordenar.")
         else:
             st.warning(f"**{n_reordenar} materiales** están alcanzando su punto de reordenamiento.")
-            st.dataframe(df_reord[cols_mostrar], use_container_width=True, hide_index=True)
+            st.dataframe(df_reord[cols_mostrar], width='stretch', hide_index=True)
 
     with tab_sobre:
         df_sobre = df_alertas[df_alertas["ALERTA"] == "SOBRE STOCK"]
@@ -108,7 +108,7 @@ else:
             st.info("No hay materiales con sobre stock.")
         else:
             st.info(f"**{n_sobrestock} materiales** superan 3x su punto de reordenamiento.")
-            st.dataframe(df_sobre[cols_mostrar], use_container_width=True, hide_index=True)
+            st.dataframe(df_sobre[cols_mostrar], width='stretch', hide_index=True)
 
 # ══════════════════════════════════════════════
 # TABLA GENERAL DE STOCK
@@ -117,7 +117,7 @@ st.markdown("---")
 st.subheader("📋 Inventario General de Stock")
 
 # Filtros
-with st.expander("🔍 Filtros", expanded=False):
+with st.expander("🔍 Filtros", expanded=True):
     col_f1, col_f2, col_f3 = st.columns(3)
 
     with col_f1:
@@ -178,7 +178,7 @@ if filtro_stock != "Todos":
         ]
 
 st.caption(f"Mostrando **{len(df_filtrado)}** de **{len(df_stock)}** materiales")
-st.dataframe(df_filtrado, use_container_width=True, hide_index=True)
+st.dataframe(df_filtrado, width='stretch', hide_index=True)
 
 # ══════════════════════════════════════════════
 # ELIMINAR REGISTRO DE STOCK
@@ -237,11 +237,11 @@ with st.expander("Eliminar un material del stock", expanded=False):
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("📋 Ir a Insumos", use_container_width=True, type="secondary"):
+    if st.button("📋 Ir a Insumos", width='stretch', type="secondary"):
         st.switch_page("pages/1_insumos.py")
 with col2:
-    if st.button("📈 Ir a Ingresos", use_container_width=True, type="secondary"):
+    if st.button("📈 Ir a Ingresos", width='stretch', type="secondary"):
         st.switch_page("pages/ingresos.py")
 with col3:
-    if st.button("📉 Ir a Salidas", use_container_width=True, type="secondary"):
+    if st.button("📉 Ir a Salidas", width='stretch', type="secondary"):
         st.switch_page("pages/salidas.py")

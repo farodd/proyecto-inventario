@@ -156,7 +156,7 @@ class InventarioDatabase:
     def delete_stock(self,codigo_sap):
         """ Eliminar un registro de stock por código SAP """
         try:
-            self.cursor.execute("DELETE FROM stock WHERE CODIGO_SAP = ?", (codigo_sap,))
+            self.cursor.execute('''DELETE FROM stock WHERE "CODIGO SAP" = ?''', (codigo_sap,))
             if self.cursor.rowcount > 0:
                 self.connection.commit()
                 print(f"✓ Stock con código SAP {codigo_sap} eliminado correctamente.")
@@ -268,20 +268,27 @@ class InventarioDatabase:
         
 # --- METODOS DE ACTUALIZACIÓN DE STOCK ---
 
-    def update_stock_on_ingreso(self, codigo_sap, cantidad):
+    def update_stock_on_ingreso(self, codigo_sap, cantidad, clasificacion=None, descripcion=None, um=None):
         """ Al registrar ingreso: sumar cantidad a STOCK ACTUAL"""
         try:
             self.cursor.execute('''
                 UPDATE stock
                 SET "STOCK ACTUAL" = "STOCK ACTUAL" + ?
-                WHERE "CODIGO SAP" = ?
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
             ''', (cantidad, codigo_sap))
             if self.cursor.rowcount > 0:
                 self.connection.commit()
                 print(f"Stock actualizado: {codigo_sap} incrementado en {cantidad}.")
                 return True
             else:
-                print(f"Material {codigo_sap} no encontrado en stock.")
+                # No existe en stock, crear nuevo registro
+                self.cursor.execute('''
+                                    INSERT INTO stock ("CODIGO SAP", "CLASIFICACION", "DESCRIPCION DEL MATERIAL", "UM", 
+                                    "STOCK INICIAL", "INGRESOS", "SALIDAS", "STOCK ACTUAL", "PUNTO DE REORDENAMIENTO")
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (codigo_sap, clasificacion, descripcion, um, cantidad, 0, 0, cantidad, 0))
+                self.connection.commit()
+                print(f"Material {codigo_sap} no encontrado en stock. Se ha creado un nuevo registro.")
                 return False
         except Exception as e:
             print(f"❌ Error al actualizar stock: {e}")
@@ -291,24 +298,25 @@ class InventarioDatabase:
         """ Al registrar salida: restar cantidad a STOCK ACTUAL"""
         try:
             self.cursor.execute('''
-                SELECT "STOCK ACTUAL" FROM stock WHERE "CODIGO SAP" = ?''',
+                SELECT "STOCK ACTUAL" FROM stock WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)''',
                 (codigo_sap,))
             row = self.cursor.fetchone()
             if not row:
                 print(f"Material {codigo_sap} no encontrado en stock.")
-                return False
-            if (row[0] or 0) < cantidad:
-                print(f"Stock insuficiente para {codigo_sap}. Stock actual: {row[0]}, cantidad solicitada: {cantidad}.")
-                return False
+                return False, None
+            stock_actual = row[0] or 0
+            if stock_actual < cantidad:
+                print(f"Stock insuficiente para {codigo_sap}. Stock actual: {stock_actual}, cantidad solicitada: {cantidad}.")
+                return False, int(stock_actual)
             
             self.cursor.execute('''
                 UPDATE stock
                 SET "STOCK ACTUAL" = "STOCK ACTUAL" - ?
-                WHERE "CODIGO SAP" = ?
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
             ''', (cantidad, codigo_sap))
             self.connection.commit()
             print(f"Stock actualizado: {codigo_sap} decrementado en {cantidad}.")
-            return True
+            return True, stock_actual - int(cantidad)
         except Exception as e:
             print(f"❌ Error al actualizar stock: {e}")
             return False, str(e)
@@ -319,7 +327,7 @@ class InventarioDatabase:
             self.cursor.execute('''
                 UPDATE stock
                 SET "STOCK ACTUAL" = MAX(0, "STOCK ACTUAL" - ?)
-                WHERE "CODIGO SAP" = ?
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
             ''', (cantidad, codigo_sap))
             self.connection.commit()
             return self.cursor.rowcount > 0
@@ -333,7 +341,7 @@ class InventarioDatabase:
             self.cursor.execute('''
                 UPDATE stock
                 SET "STOCK ACTUAL" = "STOCK ACTUAL" + ?
-                WHERE "CODIGO SAP" = ?
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
             ''', (cantidad, codigo_sap))
             self.connection.commit()
             return self.cursor.rowcount > 0

@@ -71,16 +71,23 @@ with tab_eliminar:
                     confirmar = st.checkbox("Confirmo que deseo eliminar este registro", key="confirmar_del_ing_sin")
                     if st.button("🗑️ Eliminar", type="primary", disabled=not confirmar, key="btn_del_ing_sin"):
                         db_del = InventarioDatabase(r'src\db\inventario_lp02.db')
-                        codigo_sap_ingreso = registro.get('CODIGO SAP', None)
-                        cantidad_ingreso = registro.get('CANTIDAD', 0)
+                        codigo_sap_ingreso = str(registro.get('CODIGO SAP', None))
+                        cantidad_ingreso = float(registro.get('CANTIDAD', 0))
                         resultado = db_del.delete_ingreso(int(registro['ID']))
+                        stock_revertido = False
                         if resultado:
-                            db_del.revert_stock_ingreso(codigo_sap_ingreso, cantidad_ingreso)
+                            stock_revertido = db_del.revert_stock_ingreso(codigo_sap_ingreso, cantidad_ingreso)
                         db_del.close()
-                        if resultado:
+                        if resultado and stock_revertido:
                             st.success("✅ Eliminado y stock actualizado.")
                             st.cache_data.clear()
                             time.sleep(1.5)
+                            st.rerun()
+
+                        elif resultado and not stock_revertido:
+                            st.warning("Registro eliminado pero no se pudo revertir el stock.")
+                            st.cache_data.clear()
+                            time.sleep(2)
                             st.rerun()
                         else:
                             st.error("No se pudo eliminar.")
@@ -359,7 +366,13 @@ with tab_registrar:
                 )
 
                 if resultado:
-                    stock_actualizado = db.update_stock_on_ingreso(material_actual['codigo_sap'], cantidad)
+                    stock_actualizado = db.update_stock_on_ingreso(
+                        material_actual['codigo_sap'], 
+                        cantidad,
+                        clasificacion=material_actual['clasificacion'],
+                        descripcion=material_actual['descripcion'],
+                        um=material_actual['um']
+                    )
                     db.close()
                     st.success(f"Ingreso registrado exitosamente para {material_actual['codigo_sap']}.")
                     if stock_actualizado:
