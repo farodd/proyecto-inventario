@@ -283,17 +283,17 @@ with tab1:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("📥 **Ir a Ingresos**", type="primary", width='stretch'):
+            if st.button("📥 **Ir a Ingresos**", type="primary"):
                 st.session_state['material_seleccionado'] = False
                 st.switch_page("pages/ingresos.py")
 
         with col2:
-            if st.button("📤 **Ir a Salidas**", type="primary", width='stretch'):
+            if st.button("📤 **Ir a Salidas**", type="primary"):
                 st.session_state['material_seleccionado'] = False
                 st.switch_page("pages/salidas.py")
 
         with col3:
-            if st.button("➕ **Agregar Más**", type="secondary", width='stretch'):
+            if st.button("➕ **Agregar Más**", type="secondary"):
                 # Mantener los materiales pero permitir agregar más
                 st.session_state['materiales_guardados'] = False
                 st.info("💡 Puedes seleccionar materiales adicionales de la tabla")
@@ -545,7 +545,7 @@ with tab3:
                     col_guardar, col_eliminar = st.columns([0.7, 0.3])
                     
                     with col_guardar:
-                        if st.button("💾 Guardar cambios", type="primary", width='stretch', key="btn_guardar_edicion"):
+                        if st.button("💾 Guardar cambios", type="primary", key="btn_guardar_edicion"):
                             # Validaciones
                             errores = []
                             
@@ -605,7 +605,7 @@ with tab3:
                                     st.error(f"❌ Error al actualizar: {e}")
                     
                     with col_eliminar:
-                        if st.button("🗑️ Eliminar insumo", type="secondary", width='stretch', key="btn_eliminar_insumo"):
+                        if st.button("🗑️ Eliminar insumo", type="secondary", key="btn_eliminar_insumo"):
                             st.session_state['confirmar_eliminar_insumo'] = insumo['Código SAP']
                             st.rerun()
                 

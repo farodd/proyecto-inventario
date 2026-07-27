@@ -44,7 +44,7 @@ with tab_eliminar:
     # ══════════════════════════════════════════════
     st.subheader(" Ver/Eliminar registro de Ingreso")
 
-    with st.container(border=True, width="stretch"):
+    with st.container(border=True):
         try:
             db_consulta = InventarioDatabase(r'src\db\inventario_lp02.db')
             columnas_ing, datos_ingreso = db_consulta.get_all_ingresos()
@@ -92,7 +92,7 @@ with tab_eliminar:
 
                 evento = st.dataframe(
                     df_ing_filtrado,
-                    width="stretch",
+                    
                     hide_index=True,
                     on_select="rerun",
                     selection_mode="single-row",
@@ -363,7 +363,7 @@ with tab_registrar:
 
     df_preview = pd.DataFrame.from_dict(datos_ingreso, orient='index', columns=['Valor'])
     df_preview.index.name = 'Campo'
-    st.dataframe(df_preview, width="stretch")
+    st.dataframe(df_preview)
 
     # BOTON DE GUARDAR
     if st.button("Registrar ingreso",
@@ -428,5 +428,5 @@ with tab_registrar:
     st.markdown("----")
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("Ver Stock", width="stretch", type="secondary"):
+        if st.button("Ver Stock",  type="secondary"):
             st.switch_page("pages/stock.py")
