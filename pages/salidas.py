@@ -47,11 +47,47 @@ with tab_eliminar:
 
             if datos_salida:
                 df_salida = pd.DataFrame(datos_salida, columns=columnas_sal)
+
+                # ── Filtros ──
+                with st.expander("🔍 Filtros", expanded=True):
+                    col_f1, col_f2 = st.columns(2)
+                    with col_f1:
+                        fecha_min_sal = st.date_input(
+                            "Desde:", 
+                            value=None,
+                            key="sal_fecha_min"
+                        )
+                    with col_f2:
+                        fecha_max_sal = st.date_input(
+                            "Hasta:", 
+                            value=None,
+                            key="sal_fecha_max"
+                        )
+                    
+                    col_f3, col_f4 = st.columns(2)
+                    with col_f3:
+                        clasificaciones_sal = ["Todas"] + sorted(df_salida["CLASIFICACION"].dropna().unique().tolist())
+                        filtro_clasif_sal = st.selectbox("Clasificación:", clasificaciones_sal, key="sal_filtro_clasif")
+
+                # ── Aplicar filtros ──
+                df_sal_filtrado = df_salida.copy()
+
+                if 'FECHA DE SALIDA' in df_sal_filtrado.columns:
+                    df_sal_filtrado['_fecha_dt'] = pd.to_datetime(df_sal_filtrado['FECHA DE SALIDA'], errors='coerce')
+                    if fecha_min_sal:
+                        df_sal_filtrado = df_sal_filtrado[df_sal_filtrado['_fecha_dt'] >= pd.to_datetime(fecha_min_sal)]
+                    if fecha_max_sal:
+                        df_sal_filtrado = df_sal_filtrado[df_sal_filtrado['_fecha_dt'] <= pd.to_datetime(fecha_max_sal)]
+                    df_sal_filtrado = df_sal_filtrado.drop(columns=['_fecha_dt'])
+
+                if filtro_clasif_sal != "Todas":
+                    df_sal_filtrado = df_sal_filtrado[df_sal_filtrado["CLASIFICACION"] == filtro_clasif_sal]
+
                 
                 st.info("Haz clic en una fila para seleccionar el registro a eliminar.")
 
                 evento = st.dataframe(
-                    df_salida,
+                    df_sal_filtrado,
                     width="stretch",
                     hide_index=True,
                     on_select="rerun",
@@ -60,7 +96,7 @@ with tab_eliminar:
                 )
 
                 if evento.selection.rows:
-                    registro = df_salida.iloc[evento.selection.rows[0]]
+                    registro = df_sal_filtrado.iloc[evento.selection.rows[0]]
                     st.warning(f"⚠️ Vas a eliminar: **ID {int(registro['ID'])}** — {registro.get('CODIGO SAP', '')} — {registro.get('DESCRIPCION DEL MATERIAL', '')} — Cant: {registro.get('CANTIDAD', '')}")
 
                     confirmar = st.checkbox("Confirmo que deseo eliminar este registro", key="confirmar_del_salida")
