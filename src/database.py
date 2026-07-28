@@ -171,40 +171,41 @@ class InventarioDatabase:
     def get_stock_alerts(self):
         """Obtener alertas de stock clasificadas"""
         try:
-            self.cursor.execute(''' SELECT "CODIGO SAP", 
-                                "CLASIFICACION", 
-                                "DESCRIPCION DEL MATERIAL", 
-                                "UM", 
-                                "STOCK ACTUAL", 
+            self.cursor.execute(''' SELECT "CODIGO SAP",
+                                "CLASIFICACION",
+                                "DESCRIPCION DEL MATERIAL",
+                                "UM",
+                                "STOCK ACTUAL",
                                 "PUNTO DE REORDENAMIENTO",
-                                CASE 
+                                CASE
                                     WHEN "STOCK ACTUAL" = 0 THEN 'SIN STOCK'
-                                    WHEN "PUNTO REORDENAMIENTO" > 0
+                                    WHEN "PUNTO DE REORDENAMIENTO" > 0
                                         AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 0.5
-                                        THEN "STOCK CRITICO"
-                                    WHEN "PUNTO REORDENAMIENTO" > 0
-                                        AND ("STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 1.05 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 1.20)
-                                        THEN "PROXIMO A REORDENAR"
-                                    WHEN "PUNTO REORDENAMIENTO" > 0
+                                        THEN 'STOCK CRITICO'
+                                    WHEN "PUNTO DE REORDENAMIENTO" > 0
+                                        AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 0.5
+                                        AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO"
+                                        THEN 'PROXIMO A REORDENAR'
+                                    WHEN "PUNTO DE REORDENAMIENTO" > 0
                                         AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 3
-                                        THEN "SOBRE STOCK"
+                                        THEN 'SOBRE STOCK'
                                     ELSE 'NORMAL'
                                 END AS "ALERTA"
                                 FROM stock
-                                WHERE "STOCK ACTUAL " = 0
-                                OR ("PUNTO REORDENAMIENTO" > 0 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO")
-                                OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 1.05 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 1.20)
-                                OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 3)
+                                WHERE "STOCK ACTUAL" = 0
+                                  OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO")
+                                  OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 1.05 AND "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 1.20)
+                                  OR ("PUNTO DE REORDENAMIENTO" > 0 AND "STOCK ACTUAL" > "PUNTO DE REORDENAMIENTO" * 3)
                                 ORDER BY
-                                CASE 
-                                    WHEN "STOCK ACTUAL" = 0 THEN 1
-                                    WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 0.5 THEN 2
-                                    WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" THEN 3
-                                    ELSE 4
-                                END
+                                    CASE
+                                        WHEN "STOCK ACTUAL" = 0 THEN 1
+                                        WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" * 0.5 THEN 2
+                                        WHEN "STOCK ACTUAL" <= "PUNTO DE REORDENAMIENTO" THEN 3
+                                        ELSE 4
+                                    END
                                 ''')
             columnas = [description[0] for description in self.cursor.description]
-            datos = self.cursor.fetchall() 
+            datos = self.cursor.fetchall()
             return columnas, datos
         except Exception as e:
             print(f"❌ Error al obtener alertas de stock: {e}")
@@ -269,24 +270,27 @@ class InventarioDatabase:
 # --- METODOS DE ACTUALIZACIÓN DE STOCK ---
 
     def update_stock_on_ingreso(self, codigo_sap, cantidad, clasificacion=None, descripcion=None, um=None):
-        """ Al registrar ingreso: sumar cantidad a STOCK ACTUAL"""
+        """ Al registrar ingreso: sumar cantidad a STOCK ACTUAL e INGRESOS """
         try:
             self.cursor.execute('''
                 UPDATE stock
-                SET "STOCK ACTUAL" = "STOCK ACTUAL" + ?
+                SET "STOCK ACTUAL" = COALESCE("STOCK ACTUAL", 0) + ?,
+                    "INGRESOS" = COALESCE("INGRESOS", 0) + ?
                 WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
-            ''', (cantidad, codigo_sap))
+            ''', (cantidad, cantidad, codigo_sap))
+
             if self.cursor.rowcount > 0:
                 self.connection.commit()
                 print(f"Stock actualizado: {codigo_sap} incrementado en {cantidad}.")
                 return True
             else:
-                # No existe en stock, crear nuevo registro
                 self.cursor.execute('''
-                                    INSERT INTO stock ("CODIGO SAP", "CLASIFICACION", "DESCRIPCION DEL MATERIAL", "UM", 
-                                    "STOCK INICIAL", "INGRESOS", "SALIDAS", "STOCK ACTUAL", "PUNTO DE REORDENAMIENTO")
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (codigo_sap, clasificacion, descripcion, um, cantidad, 0, 0, cantidad, 0))
+                    INSERT INTO stock (
+                        "CODIGO SAP", "CLASIFICACION", "DESCRIPCION DEL MATERIAL", "UM",
+                        "STOCK INICIAL", "INGRESOS", "SALIDAS", "STOCK ACTUAL", "PUNTO DE REORDENAMIENTO"
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (codigo_sap, clasificacion, descripcion, um, cantidad, cantidad, 0, cantidad, 0))
                 self.connection.commit()
                 print(f"Material {codigo_sap} no encontrado en stock. Se ha creado un nuevo registro.")
                 return False
@@ -295,28 +299,38 @@ class InventarioDatabase:
             return False
         
     def update_stock_on_salida(self, codigo_sap, cantidad):
-        """ Al registrar salida: restar cantidad a STOCK ACTUAL"""
+        """ Al registrar salida: restar cantidad a STOCK ACTUAL y sumar a SALIDAS """
         try:
             self.cursor.execute('''
-                SELECT "STOCK ACTUAL" FROM stock WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)''',
-                (codigo_sap,))
+                SELECT "STOCK ACTUAL" FROM stock
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
+            ''', (codigo_sap,))
             row = self.cursor.fetchone()
             if not row:
                 print(f"Material {codigo_sap} no encontrado en stock.")
                 return False, None
+
             stock_actual = row[0] or 0
             if stock_actual < cantidad:
                 print(f"Stock insuficiente para {codigo_sap}. Stock actual: {stock_actual}, cantidad solicitada: {cantidad}.")
                 return False, int(stock_actual)
-            
+
             self.cursor.execute('''
                 UPDATE stock
-                SET "STOCK ACTUAL" = "STOCK ACTUAL" - ?
+                SET "STOCK ACTUAL" = MAX(0, COALESCE("STOCK ACTUAL",0) - ?),
+                    "SALIDAS" = COALESCE("SALIDAS",0) + ?
                 WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
-            ''', (cantidad, codigo_sap))
+            ''', (cantidad, cantidad, codigo_sap))
             self.connection.commit()
+
+            self.cursor.execute('''
+                SELECT "STOCK ACTUAL" FROM stock
+                WHERE CAST("CODIGO SAP" AS TEXT) = CAST(? AS TEXT)
+            ''', (codigo_sap,))
+            nuevo_stock = self.cursor.fetchone()[0] or 0
+
             print(f"Stock actualizado: {codigo_sap} decrementado en {cantidad}.")
-            return True, stock_actual - int(cantidad)
+            return True, int(nuevo_stock)
         except Exception as e:
             print(f"❌ Error al actualizar stock: {e}")
             return False, str(e)
