@@ -9,7 +9,7 @@ Sistema de gestión de inventario y control de costos para la bodega LP02 de una
 
 A continuación se presenta el panel de control de existencias con alertas de stock mínimo y filtros dinámicos. Las capturas de este README presentan columnas y/o datos ocultos y a su vez no se publican los datos reales por confidencialidad.
 
-![Panel de control de existencias con alertas de stock](docs\img\control_stock.png)
+![Panel de control de existencias con alertas de stock](docs/img/control_stock.png)
 
 
 ---
@@ -66,7 +66,7 @@ El presupuesto creció 9,4% entre ambos periodos, por lo que el logro está en l
 
 Los datos presentes en el dashboard a continuación corresponden a la base de datos de ejemplo que se proporciona en el isntructivo de uso de la aplicación
 
-![Tablero de seguimiento presupuestario:](docs\img\control_costo.png)
+![Tablero de seguimiento presupuestario:](docs/img/control_costo.png)
 
 El gasto acumulado contra objetivo, evolución mensual y desglose por clasificación y material corresponden a la base de datos ficticia que se brinda en el instructivo para poder utilizar la aplicación desarrollada y cumpliendo con la confidencialidad de los datos.
 ### Eficiencia operativa
@@ -106,7 +106,7 @@ También se identificó que un **20% de las diferencias de inventario de 2024** 
 | **Dashboard Power BI** | Seguimiento presupuestario, gasto acumulado y análisis por clasificación de material. |
 
 
-![Formulario de ingreso/modificación de insumos](docs\img\gestion_insumo.png)
+![Formulario de ingreso/modificación de insumos](docs/img/gestion_insumo.png)
 
 la clasificación y la unidad de medida se seleccionan desde la metadata normalizada, evitando la digitación libre que originaba los errores de registro.
 ---
