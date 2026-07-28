@@ -7,6 +7,11 @@ Sistema de gestión de inventario y control de costos para la bodega LP02 de una
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black)
 
+A continuación se presenta el panel de control de existencias con alertas de stock mínimo y filtros dinámicos. Las capturas de este README presentan columnas y/o datos ocultos y a su vez no se publican los datos reales por confidencialidad.
+
+![Panel de control de existencias con alertas de stock](docs\img\control_stock.png)
+
+
 ---
 
 ## El problema
@@ -59,6 +64,11 @@ Periodo de validación medido: **3 meses**.
 
 El presupuesto creció 9,4% entre ambos periodos, por lo que el logro está en la **precisión de la ejecución**, no en la reducción del gasto absoluto. Presupuesto bajo gestión en 2026: 6.000.000 USD (≈ $5.460 MM CLP).
 
+Los datos presentes en el dashboard a continuación corresponden a la base de datos de ejemplo que se proporciona en el isntructivo de uso de la aplicación
+
+![Tablero de seguimiento presupuestario:](docs\img\control_costo.png)
+
+El gasto acumulado contra objetivo, evolución mensual y desglose por clasificación y material corresponden a la base de datos ficticia que se brinda en el instructivo para poder utilizar la aplicación desarrollada y cumpliendo con la confidencialidad de los datos.
 ### Eficiencia operativa
 
 | Métrica | Antes | Después | Mejora |
@@ -95,24 +105,30 @@ También se identificó que un **20% de las diferencias de inventario de 2024** 
 | **Control de stock** | Panel de existencias con alertas de stock mínimo, filtros dinámicos y métricas operativas. |
 | **Dashboard Power BI** | Seguimiento presupuestario, gasto acumulado y análisis por clasificación de material. |
 
+
+![Formulario de ingreso/modificación de insumos](docs\img\gestion_insumo.png)
+
+la clasificación y la unidad de medida se seleccionan desde la metadata normalizada, evitando la digitación libre que originaba los errores de registro.
 ---
 
 ## Arquitectura
 
 ```
 inventario_app/
+├── inventory_stock.py          # Punto de entrada de la aplicación
 ├── pages/
-│   ├── 1_insumos.py        # Catálogo de insumos
-│   ├── ingresos.py         # Registro de entradas
-│   ├── salidas.py          # Registro de retiros
-│   └── stock.py            # Panel de control de existencias
+│   ├── 1_insumos.py            # Catálogo de insumos
+│   ├── ingresos.py             # Registro de entradas
+│   ├── salidas.py              # Registro de retiros
+│   └── stock.py                # Panel de control de existencias
 ├── src/
-│   ├── create_sample_db.py # Crea base de datos ficticia para ser utilizada como prueba
-│   ├── database.py         # Persistencia: consultas, inserciones y reversión de stock
-│   ├── data_process.py     # Normalización de clasificaciones y unidades
+│   ├── create_sample_db.py     # Genera una base de datos ficticia de prueba
+│   ├── database.py             # Persistencia: consultas, inserciones y reversión de stock
+│   ├── data_process.py         # Normalización de clasificaciones y unidades
 │   └── db/
 │       └── inventario_lp02_sample.db
-├── metadata/               # JSON de clasificaciones y unidades de medida
+├── metadata/                   # JSON de clasificaciones y unidades de medida
+├── docs/img/                   # Capturas de pantalla
 └── requirements.txt
 ```
 
@@ -139,11 +155,19 @@ pip install -r requirements.txt
 ```
 
 ## Uso
-Debido a la confidencialidad de los datos estos no fueron subidos al repositorio. por ende, se definidio una base de datos ficticia para poder ser utilizada como prueba con el siguiente instructivo estando ubicado en carpeta principal del repositorio (inventario_app):
+Por confidencialidad, los datos productivos no se incluyen en el repositorio. El proyecto trae un generador de base de datos ficticia para poder probar la aplicación con datos de ejemplo.
+
+Desde la carpeta principal del repositorio:
 ```bash
-1. Para crear BD ficticia: python src\create_sample_db.py
-2. La app utilizara la ruta y archivo definida de la BD creada en el paso anterior: copy "src\db\inventario_lp02_sample.db" "src\db\inventario_lp02.db"
-3. Ejecutar aplicación: streamlit run inventory_stock.py
+# 1. Generar la base de datos de ejemplo
+python src/create_sample_db.py
+
+# 2. Habilitarla como base activa de la aplicación
+cp src/db/inventario_lp02_sample.db src/db/inventario_lp02.db     # Linux / macOS
+copy src\db\inventario_lp02_sample.db src\db\inventario_lp02.db   # Windows
+
+# 3. Ejecutar la aplicación
+streamlit run inventory_stock.py
 ```
 
 La aplicación queda disponible en `http://localhost:8501`. La navegación entre Insumos, Ingresos, Salidas y Control de Stock se realiza desde la barra lateral.
