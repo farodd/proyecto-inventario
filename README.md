@@ -123,7 +123,7 @@ inventario_app/
 ## Instalación
 
 Requiere Python 3.10 o superior.
-
+Estando ubicado en terminal utilizar los siguientes códigos:
 ```bash
 # Clonar el repositorio
 git clone https://github.com/farodd/proyecto-inventario.git
@@ -139,9 +139,11 @@ pip install -r requirements.txt
 ```
 
 ## Uso
-
+Debido a la confidencialidad de los datos estos no fueron subidos al repositorio. por ende, se definidio una base de datos ficticia para poder ser utilizada como prueba con el siguiente instructivo estando ubicado en carpeta principal del repositorio (inventario_app):
 ```bash
-streamlit run inventory_stock.py
+1. Para crear BD ficticia: python src\create_sample_db.py
+2. La app utilizara la ruta y archivo definida de la BD creada en el paso anterior copy "src\db\inventario_lp02_sample.db" "src\db\inventario_lp02.db"
+3. Ejecutar aplicación: streamlit run inventory_stock.py
 ```
 
 La aplicación queda disponible en `http://localhost:8501`. La navegación entre Insumos, Ingresos, Salidas y Control de Stock se realiza desde la barra lateral.
