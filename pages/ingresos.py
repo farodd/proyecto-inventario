@@ -363,6 +363,18 @@ with tab_registrar:
 
     df_preview = pd.DataFrame.from_dict(datos_ingreso, orient='index', columns=['Valor'])
     df_preview.index.name = 'Campo'
+    # Normalizar valores para evitar tipos mixtos (bytes/float/None) que rompen pyarrow
+    def _safe_str(v):
+        if isinstance(v, (bytes, bytearray)):
+            try:
+                return v.decode('utf-8', errors='ignore')
+            except Exception:
+                return str(v)
+        if v is None:
+            return ""
+        return str(v)
+
+    df_preview['Valor'] = df_preview['Valor'].apply(_safe_str)
     st.dataframe(df_preview)
 
     # BOTON DE GUARDAR
