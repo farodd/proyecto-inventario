@@ -100,17 +100,18 @@ También se identificó que un **20% de las diferencias de inventario de 2024** 
 ## Arquitectura
 
 ```
-proyecto-inventario/
+inventario_app/
 ├── pages/
 │   ├── 1_insumos.py        # Catálogo de insumos
 │   ├── ingresos.py         # Registro de entradas
 │   ├── salidas.py          # Registro de retiros
 │   └── stock.py            # Panel de control de existencias
 ├── src/
+│   ├── create_sample_db.py # Crea base de datos ficticia para ser utilizada como prueba
 │   ├── database.py         # Persistencia: consultas, inserciones y reversión de stock
 │   ├── data_process.py     # Normalización de clasificaciones y unidades
 │   └── db/
-│       └── inventario_lp02.db
+│       └── inventario_lp02_sample.db
 ├── metadata/               # JSON de clasificaciones y unidades de medida
 └── requirements.txt
 ```
@@ -125,7 +126,7 @@ Requiere Python 3.10 o superior.
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/<usuario>/proyecto-inventario.git
+git clone https://github.com/farodd/proyecto-inventario.git
 cd proyecto-inventario
 
 # Crear y activar el entorno virtual
@@ -140,7 +141,7 @@ pip install -r requirements.txt
 ## Uso
 
 ```bash
-streamlit run app.py
+streamlit run inventory_stock.py
 ```
 
 La aplicación queda disponible en `http://localhost:8501`. La navegación entre Insumos, Ingresos, Salidas y Control de Stock se realiza desde la barra lateral.
