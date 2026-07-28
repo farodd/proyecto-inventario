@@ -142,7 +142,7 @@ pip install -r requirements.txt
 Debido a la confidencialidad de los datos estos no fueron subidos al repositorio. por ende, se definidio una base de datos ficticia para poder ser utilizada como prueba con el siguiente instructivo estando ubicado en carpeta principal del repositorio (inventario_app):
 ```bash
 1. Para crear BD ficticia: python src\create_sample_db.py
-2. La app utilizara la ruta y archivo definida de la BD creada en el paso anterior copy "src\db\inventario_lp02_sample.db" "src\db\inventario_lp02.db"
+2. La app utilizara la ruta y archivo definida de la BD creada en el paso anterior: copy "src\db\inventario_lp02_sample.db" "src\db\inventario_lp02.db"
 3. Ejecutar aplicación: streamlit run inventory_stock.py
 ```
 
